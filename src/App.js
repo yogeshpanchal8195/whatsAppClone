@@ -14,7 +14,7 @@ function App(props) {
         <Sidebar />
         <Router history={history}>
           <Switch>
-            <Route path="/rooms/:roomId" component={Chat}>
+            <Route path="/rooms/:roomId" component={(props)=>{console.log(props);return <Chat {...props}/>}}>
               {/* <Chat /> */}
             </Route>
           </Switch>
