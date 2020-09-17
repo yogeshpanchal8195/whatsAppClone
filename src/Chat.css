@@ -52,16 +52,17 @@
 }
 
 .chat .chat_body .chat_message.chat_reciever{
-    float: right;
+    margin-left: auto;
     background-color: #dcf8c6;
 }
 
 .chat .chat_body .chat_message .chat_name{
     position: absolute;
     top: -22px;
-    left: 2px;
+    right: 2px;
     font-weight: 800;
     font-size: 13px;
+    width: max-content;
 }
 
 .chat .chat_body .chat_message .chat_time{

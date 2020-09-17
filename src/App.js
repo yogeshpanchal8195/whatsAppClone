@@ -1,25 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import Sidebar from './Sidebar';
 import Chat from './Chat';
-import { Router, Switch, Route } from 'react-router-dom';
-import { createBrowserHistory } from 'history';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import Login from './Login';
+import { useStateValue } from './StateProvider';
 
 function App(props) {
-  console.log(props);
-  const history = createBrowserHistory();
+  const [{user},dispatch]=useStateValue();
+
   return (
     <div className="app">
-      <div className="app_body">
-        <Sidebar />
-        <Router history={history}>
-          <Switch>
-            <Route path="/rooms/:roomId" component={(props)=>{console.log(props);return <Chat {...props}/>}}>
-              {/* <Chat /> */}
-            </Route>
-          </Switch>
-        </Router>
-      </div>
+      {!user ?
+        <Login/>
+        :
+        <div className="app_body">
+          <Router>
+            <Sidebar />
+            <Switch>
+              <Route path="/rooms/:roomId" component={Chat}>
+              </Route>
+            </Switch>
+          </Router>
+        </div>
+      }
+
     </div>
   );
 }

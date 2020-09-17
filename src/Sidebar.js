@@ -3,28 +3,41 @@ import "./Sidebar.css";
 import { Avatar, IconButton } from '@material-ui/core';
 import { SearchOutlined, MoreVert, DonutLarge, Chat } from '@material-ui/icons';
 import SidebarChat from './SidebarChat';
-import db, { auth, provider } from './firebase';
+import db from './firebase';
+import { useStateValue } from './StateProvider';
 
 function Sidebar() {
 
     const [rooms, setRooms] = useState([]);
+    const [{ user }, dispatch] = useStateValue();
 
     useEffect(() => {
-        const unsubscribe=db.collection('rooms').onSnapshot((snapshot) => {
+        const unsubscribe = db.collection('rooms').onSnapshot((snapshot) => {
             setRooms(snapshot.docs.map(doc => (
                 {
-                    id:doc.id,
-                    data:doc.data()
+                    id: doc.id,
+                    data: doc.data()
                 }
             )))
         })
     }, []);
-     
+
+    useEffect(() => {
+        const unsubscribe = db.collection('rooms').onSnapshot((snapshot) => {
+            setRooms(snapshot.docs.map(doc => (
+                {
+                    id: doc.id,
+                    data: doc.data()
+                }
+            )))
+        })
+    }, [rooms]);
+
 
     return (
         <div className="sidebar">
             <div className="sidebar_header">
-                <Avatar />
+                <Avatar src={user.photoURL} />
                 <div className="sidebar_headerRight">
                     <IconButton>
                         <DonutLarge />
@@ -44,9 +57,9 @@ function Sidebar() {
                 </div>
             </div>
             <div className="sidebar_chats">
-                <SidebarChat addNewChat={true}/>
-                {rooms.map((room)=>(
-                    <SidebarChat key={room.id} id={room.id} name={room.data.name}/>
+                <SidebarChat addNewChat={true} />
+                {rooms.map((room) => (
+                    <SidebarChat key={room.id} id={room.id} name={room.data.name} />
                 ))}
             </div>
         </div>

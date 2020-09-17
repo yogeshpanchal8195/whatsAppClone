@@ -2,157 +2,68 @@ import React, { useEffect, useState } from 'react'
 import { Avatar, IconButton } from '@material-ui/core';
 import { SearchOutlined, MoreVert, AttachFile, InsertEmoticon, MicRounded } from '@material-ui/icons';
 import './Chat.css'
-import { useParams, useLocation , withRouter } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import db from './firebase';
-import queryString from 'query-string';
+import { useStateValue } from './StateProvider';
+import firebase from 'firebase';
 
-import { createBrowserHistory } from 'history';
-// function Chat(props) {
-//     console.log(props);
-//     const [seed, setSeed] = useState('');
-//     const [input, setInput] = useState('');
-//     const [roomName, setRoomName] = useState('')
+function Chat(props) {
+    const [seed, setSeed] = useState('');
+    const [input, setInput] = useState('');
+    const [roomName, setRoomName] = useState('');
+    const [messages, setMessages] = useState([]);
+    const [{ user }, dispatch] = useStateValue();
 
-//     // const history = createBrowserHistory();
-//     props.history.listen((location, action) => {
-//         debugger
-//         console.log(`The current URL is ${location.pathname}${location.search}${location.hash}`)
-//         console.log(`The last navigation action was ${action}`)
-//     })
+    var { roomId } = useParams();
+    // var roomId = props.match.params.roomId;
 
-//     // var { roomId } = useParams();
-//     console.log("PP", props.match.params.roomId)
-//     var roomId = props.match.params.roomId;
-
-//     useEffect(() => {
-//         alert(roomId);
-//         if (roomId) {
-//             db.collection('rooms').doc(roomId).onSnapshot((snapshot) => {
-//                 setRoomName(snapshot.data().name)
-//             })
-//         }
-//     }, [roomId])
-
-
-//     // const [locationRef,setlocationRef] = useState(React.useRef(window.location));
-//     // debugger
-//     // React.useEffect(() => {
-//     //     debugger
-//     //     locationRef.current = window.location;
-//     // }, [window.location]);
-
-//     // const getLocation = React.useCallback(() => locationRef.current, [
-//     //     locationRef,
-//     // ]);
-
-//     // const setLocation = React.useCallback(
-//     //     ()=>{
-//     //         setlocationRef(locationRef.current)
-//     //     },
-//     //     [history]
-//     // );
-
-//     // const location = useLocation();
-//     // React.useEffect(() => {
-//     //     console.log('Location changed');
-//     // }, [location]);
-
-
-//     useEffect(() => {
-//         setSeed(Math.floor(Math.random() * 5000));
-//     }, [roomId])
-
-//     const sendMessage = function (event) {
-//         event.preventDefault();
-//         console.log(input);
-//         setInput("");
-//     }
-
-//     return (
-//         <div className='chat'>
-//             <div className="chat_header">
-//                 <Avatar src={`https://avatars.dicebear.com/api/human/${seed}.svg`} />
-//                 <div className="chat_headerInfo">
-//                     <h3>{roomName}</h3>
-//                     <p>Last seen at...</p>
-//                 </div>
-//                 <div className="chat_headerRight">
-//                     <IconButton>
-//                         <SearchOutlined />
-//                     </IconButton>
-//                     <IconButton>
-//                         <AttachFile />
-//                     </IconButton>
-//                     <IconButton>
-//                         <MoreVert />
-//                     </IconButton>
-//                 </div>
-//             </div>
-//             <div className="chat_body">
-//                 <div className="chat_message">
-//                     Hey Guys
-//                     <span className="chat_name">Yogesh</span>
-//                     <span className="chat_time">11:00 am</span>
-//                 </div>
-//                 <div className={`chat_message ${true && 'chat_reciever'}`}>
-//                     Hey Guyzzzz
-//                     <span className="chat_name">Sanjana</span>
-//                     <span className="chat_time">11:00 am</span>
-//                 </div>
-//             </div>
-//             <div className="chat_footer">
-//                 <IconButton>
-//                     <InsertEmoticon />
-//                 </IconButton>
-//                 <form>
-//                     <input value={input} onChange={e => setInput(e.target.value)} type="text" placeholder="Type a Message" />
-//                     <button type="submit" onClick={sendMessage}>Send a message</button>
-//                 </form>
-//                 <IconButton>
-//                     <MicRounded />
-//                 </IconButton>
-//             </div>
-//         </div>
-//     )
-// }
-
-
-class Chat extends React.Component {
-
-    constructor(props){
-        super(props)
-        console.log("XX",props.match.params.roomId)
-        console.log("yy",this.props.match.params.roomId)
-    }
-
-    sendMessage = function (event) {
-        event.preventDefault();
-        // console.log(input);
-        // setInput("");
-    }
-
-    componentDidUpdate(prevProps) {
-        debugger
-        if (this.props.location !== prevProps.location) {
+    useEffect(() => {
+        if (roomId) {
+            db.collection('rooms').doc(roomId).onSnapshot((snapshot) => {
+                setRoomName(snapshot.data().name)
+            })
+            db.collection('rooms').doc(roomId).collection('messages').orderBy('timestamp', 'asc').onSnapshot((snapshot) => {
+                setMessages(snapshot.docs.map((msg) => msg.data()));
+            })
         }
-      }
+    }, [roomId])
 
-    componentDidMount(){
-        console.log("PPPPOOPOPOO");
-        debugger
-        console.log("PPPP",this.props.match.params.roomId);
+
+    useEffect(() => {
+        setSeed(Math.floor(Math.random() * 5000));
+    }, [roomId])
+
+    const sendMessage = function (event) {
+        event.preventDefault();
+        let obj = {
+            'name': user.displayName,
+            'message': input,
+            // 'timestamp':new Date(),
+            'timestamp': firebase.firestore.FieldValue.serverTimestamp(),
+        }
+        db.collection('rooms').doc(roomId).collection('messages').add(obj)
+        // setMessages(messages=>messages.push(obj));
+        setInput("");
     }
 
-    render() {
-        console.log("ZZ",this.props);
-        // console.log("ZZ",this.props.match.params.roomId)
-        return (
-            <div className='chat'>
+    const showDate=(message)=>{
+        if(message && message.timestamp && message.timestamp.toDate){
+            if(!new Date(message.timestamp.toDate()).toUTCString() || new Date(message.timestamp.toDate()).toUTCString().toLowerCase() == 'invalida date'){
+                return ""
+            }else if(new Date(message.timestamp.toDate()).toUTCString()){
+                return new Date(message.timestamp.toDate()).toUTCString();
+            }
+        }
+        return "";
+    }
+
+    return (
+        <div className='chat'>
             <div className="chat_header">
-                {/* <Avatar src={`https://avatars.dicebear.com/api/human/${seed}.svg`} /> */}
+                <Avatar src={`https://avatars.dicebear.com/api/human/${seed}.svg`} />
                 <div className="chat_headerInfo">
-                    {/* <h3>{roomName}</h3> */}
-                    <p>Last seen at...</p>
+                    <h3>{roomName}</h3>
+                    <p>{messages.length && showDate(messages[messages.length - 1])}</p>
                 </div>
                 <div className="chat_headerRight">
                     <IconButton>
@@ -167,34 +78,29 @@ class Chat extends React.Component {
                 </div>
             </div>
             <div className="chat_body">
-                <div className="chat_message">
-                    Hey Guys
-                    <span className="chat_name">Yogesh</span>
-                    <span className="chat_time">11:00 am</span>
-                </div>
-                <div className={`chat_message ${true && 'chat_reciever'}`}>
-                    Hey Guyzzzz
-                    <span className="chat_name">Sanjana</span>
-                    <span className="chat_time">11:00 am</span>
-                </div>
+                {messages.map((message) => (
+                    <div className={`chat_message ${message.name == user.displayName && 'chat_reciever'}`}>
+                        {message.message}
+                        <span className="chat_name">{message.name}</span>
+                        <span className="chat_time">{showDate(message)}</span>
+                    </div>
+                ))}
             </div>
             <div className="chat_footer">
                 <IconButton>
                     <InsertEmoticon />
                 </IconButton>
                 <form>
-                    {/* <input value={input} onChange={e => setInput(e.target.value)} type="text" placeholder="Type a Message" />
-                    <button type="submit" onClick={sendMessage}>Send a message</button> */}
+                    <input value={input} onChange={e => setInput(e.target.value)} type="text" placeholder="Type a Message" />
+                    <button type="submit" onClick={sendMessage}>Send a message</button>
                 </form>
                 <IconButton>
                     <MicRounded />
                 </IconButton>
             </div>
         </div>
-        )
-    }
+    )
 }
 
-export default withRouter(Chat);
-
+export default Chat;
 

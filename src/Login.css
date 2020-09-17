@@ -1,0 +1,30 @@
+.login{
+    width: 50vw;
+    height: 50vh;
+    background-color: white;
+    display: grid;
+    place-content: center;
+    place-items: center;
+    border-radius: 8px;
+}
+
+.login .login_conatiner{
+    display: grid;
+    place-content: center;
+    place-items: center;
+}
+
+.login .login_conatiner h1{
+    margin: 30px 0;
+}
+
+.login .login_conatiner img{
+    height: 120px;
+    width: 120px;
+}
+
+.login .login_conatiner Button{
+    color: white;
+    background-color: #5b993e;
+    padding: 8px 14px;
+}

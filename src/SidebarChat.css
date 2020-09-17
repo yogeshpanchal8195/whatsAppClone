@@ -10,6 +10,11 @@
     background-color: #ebebeb;
 }
 
+a{
+    text-decoration: none;
+    color: black;
+}
+
 .sidebarChat_info{
     margin-left: 14px;
 }
