@@ -49,6 +49,7 @@
     background-color: white;
     margin-bottom: 38px;
     padding-bottom: 14px;
+    position: relative;
 }
 
 .chat .chat_body .chat_message.chat_reciever{
@@ -69,8 +70,9 @@
     font-size: 12px;
     color: gray;
     margin-left: 16px;
-    top: 8px;
+    top: 4px;
     position: relative;
+    display: block;
 }
 
 .chat .chat_footer{
@@ -97,4 +99,52 @@
 
 .chat .chat_footer form button{
     display: none;
+}
+
+.back_btn{
+    display: none;
+}
+
+
+@media only screen and (max-width:659px){
+    .back_btn{
+        display: block;
+    }
+    .chat{
+        flex: 1;
+        height: 100vh;
+        max-height: 100vh;
+    }
+    .chat .chat_header{
+        padding: 8px 0px;
+        z-index: 99;
+        box-shadow: 0px 2px 9px rgba(0,0,0,0.4);
+    }
+    .chat .chat_headerInfo{
+        max-width: calc(100% - 112px);
+        padding-left: 12px;
+    }
+
+    .chat .chat_headerInfo h3{
+        /* text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        width: 100%; */
+    }
+    .chat .chat_headerRight{
+        display: none;
+    }
+    .chat .chat_footer{
+        z-index: 99;
+        box-shadow: 2px -2px 13px rgba(0,0,0,0.4);
+    }
+    .chat .chat_body{
+        padding: 8px;
+    }
+    .chat .chat_body .chat_message{
+        max-width: 78%;
+        font-size: 14px;
+        padding: 10px 6px;
+        border-radius: 8px;
+    }
 }

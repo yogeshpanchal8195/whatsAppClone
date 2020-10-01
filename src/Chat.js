@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { Avatar, IconButton } from '@material-ui/core';
-import { SearchOutlined, MoreVert, AttachFile, InsertEmoticon, MicRounded } from '@material-ui/icons';
+import { SearchOutlined, MoreVert, AttachFile, InsertEmoticon, MicRounded, ArrowBackSharp } from '@material-ui/icons';
 import './Chat.css'
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import db from './firebase';
 import { useStateValue } from './StateProvider';
 import firebase from 'firebase';
@@ -15,7 +15,8 @@ function Chat(props) {
     const [{ user }, dispatch] = useStateValue();
 
     var { roomId } = useParams();
-    // var roomId = props.match.params.roomId;
+    const history = useHistory();
+    
 
     useEffect(() => {
         if (roomId) {
@@ -46,20 +47,27 @@ function Chat(props) {
         setInput("");
     }
 
-    const showDate=(message)=>{
-        if(message && message.timestamp && message.timestamp.toDate){
-            if(!new Date(message.timestamp.toDate()).toUTCString() || new Date(message.timestamp.toDate()).toUTCString().toLowerCase() == 'invalida date'){
+    const showDate = (message) => {
+        if (message && message.timestamp && message.timestamp.toDate) {
+            if (!new Date(message.timestamp.toDate()).toUTCString() || new Date(message.timestamp.toDate()).toUTCString().toLowerCase() == 'invalida date') {
                 return ""
-            }else if(new Date(message.timestamp.toDate()).toUTCString()){
+            } else if (new Date(message.timestamp.toDate()).toUTCString()) {
                 return new Date(message.timestamp.toDate()).toUTCString();
             }
         }
         return "";
     }
 
+    const backBtnMove = () => {
+        history.push("/rooms")
+    }
+
     return (
         <div className='chat'>
             <div className="chat_header">
+                <IconButton className="back_btn" onClick={backBtnMove}>
+                    <ArrowBackSharp />
+                </IconButton>
                 <Avatar src={`https://avatars.dicebear.com/api/human/${seed}.svg`} />
                 <div className="chat_headerInfo">
                     <h3>{roomName}</h3>

@@ -1,6 +1,7 @@
 .login{
     width: 50vw;
     height: 50vh;
+    min-width: 320px;
     background-color: white;
     display: grid;
     place-content: center;
@@ -27,4 +28,11 @@
     color: white;
     background-color: #5b993e;
     padding: 8px 14px;
+}
+
+
+@media only screen and (max-width:659px){
+    .login{
+        min-width: 320px;
+    }
 }

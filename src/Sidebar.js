@@ -5,8 +5,9 @@ import { SearchOutlined, MoreVert, DonutLarge, Chat } from '@material-ui/icons';
 import SidebarChat from './SidebarChat';
 import db from './firebase';
 import { useStateValue } from './StateProvider';
+import { useParams } from 'react-router-dom';
 
-function Sidebar() {
+function Sidebar(props) {
 
     const [rooms, setRooms] = useState([]);
     const [{ user }, dispatch] = useStateValue();
@@ -33,9 +34,14 @@ function Sidebar() {
         })
     }, [rooms]);
 
+    var roomId=window.location.pathname.slice(7);;
+    useEffect(() => {
+        roomId = window.location.pathname.slice(7);
+    }, [window.location.pathname])
+
 
     return (
-        <div className="sidebar">
+        <div className={`sidebar ${roomId ? 'sidebarMbParam' : ''} `} >
             <div className="sidebar_header">
                 <Avatar src={user.photoURL} />
                 <div className="sidebar_headerRight">
